@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      width: 200px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .task-list-item {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 10px 0;
+      padding: 10px;
+      align-items: center;
+    }
+
+    .delete-button {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Task Manager</h1>
+    <div class="input-container">
+      <input type="text" id="task" placeholder="Enter a task">
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul class="task-list" id="taskList"></ul>
+  </div>
+
+  <script>
+    async function getTasks() {
+      const response = await fetch('/tasks');
+      const tasks = await response.json();
+      return tasks;
+    }
+
+    async function addTask() {
+      const taskInput = document.getElementById('task');
+      const task = taskInput.value;
+      if (!task) return;
+
+      const response = await fetch('/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `task=${task}`,
+      });
+
+      if (response.status === 201) {
+        taskInput.value = '';
+        await loadTasks();
+      }
+    }
+
+    async function deleteTask(id) {
+      const response = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+      if (response.status === 204) {
+        await loadTasks();
+      }
+    }
+
+    async function loadTasks() {
+      const taskList = document.getElementById('taskList');
+      const tasks = await getTasks();
+      taskList.innerHTML = '';
+
+      tasks.forEach((task) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'task-list-item';
+        listItem.innerHTML = `
+          <span>${task.task}</span>
+          <button class="delete-button" onclick="deleteTask(${task.id})">Delete</button>
+        `;
+        taskList.appendChild(listItem);
+      });
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
+
