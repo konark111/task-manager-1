@@ -1,0 +1,8 @@
+version: '3'
+services:
+  task:
+    image: task-manager-1 
+    ports:
+      - "8085:3000"
+    deploy:
+      replicas: 3
