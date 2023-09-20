@@ -1,5 +1,9 @@
 Creating a fully automated ci/cd pipeline
 
+TOOLS USER
+- Jenkins
+- Docker
+- Sonarqube
+- Github
 
 
-mocha test/test.js --exit
