@@ -16,11 +16,9 @@ pipeline {
             steps {
                 // Install npm dependencies
                 sh 'npm install'
-
                 // Run tests with Mocha
                 script {
                     def testResult = sh(script: 'mocha test/test.js --exit', returnStatus: true)
-                
                     // Check if the tests passed
                     if (testResult == 0) {
                         echo 'All tests passed!'
@@ -49,14 +47,11 @@ pipeline {
                 expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
                      }
             steps {
-                
-                
                 // Build and deploy with Docker-compose
                 sh 'docker build -t task-manager-1 .'
         
                 sh 'docker-compose down && docker-compose up -d'
             }
         }
-
 }
 }
